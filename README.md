@@ -77,9 +77,6 @@ The database settings are in `config/config.php`:
 
 If your XAMPP has a different password, edit the `config/config.php` file.
 
-## Need Help?
-
-Contact the project owner or create an issue on GitHub.
 =======
 # IM-FinalProject
 >>>>>>> 947391a30dd13585edfa4139eddf7340cca2007f
