@@ -30,6 +30,13 @@ if (mysqli_num_rows($result) == 0) {
 // Get the reservation data
 $reservation = mysqli_fetch_assoc($result);
 
+// Check if reservation is confirmed or cancelled (they cannot be edited)
+if ($reservation['status'] == 'confirmed' || $reservation['status'] == 'cancelled') {
+    // Redirect back - confirmed and cancelled reservations cannot be edited
+    header("Location: reservations.php");
+    exit();
+}
+
 // This variable will hold error or success messages
 $message = "";
 
@@ -41,15 +48,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $reservation_time = $_POST['reservation_time'];
     $number_of_guests = $_POST['number_of_guests'];
     $special_requests = $_POST['special_requests'];
-    $status = $_POST['status'];
 
-    // Update the reservation in the database
+    // Update the reservation in the database (customers cannot change status)
     $sql = "UPDATE reservations SET
             reservation_date = '$reservation_date',
             reservation_time = '$reservation_time',
             number_of_guests = '$number_of_guests',
-            special_requests = '$special_requests',
-            status = '$status'
+            special_requests = '$special_requests'
             WHERE id = '$reservation_id' AND user_id = '$user_id'";
 
     if (mysqli_query($conn, $sql)) {
@@ -127,15 +132,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <option value="8" <?php if($reservation['number_of_guests'] == 8) echo 'selected'; ?>>8 Guests</option>
                         <option value="9" <?php if($reservation['number_of_guests'] == 9) echo 'selected'; ?>>9 Guests</option>
                         <option value="10" <?php if($reservation['number_of_guests'] == 10) echo 'selected'; ?>>10+ Guests</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    <select id="status" name="status" required>
-                        <option value="pending" <?php if($reservation['status'] == 'pending') echo 'selected'; ?>>Pending</option>
-                        <option value="confirmed" <?php if($reservation['status'] == 'confirmed') echo 'selected'; ?>>Confirmed</option>
-                        <option value="cancelled" <?php if($reservation['status'] == 'cancelled') echo 'selected'; ?>>Cancelled</option>
                     </select>
                 </div>
 

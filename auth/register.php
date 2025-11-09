@@ -30,8 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Hash the password to keep it secret and safe
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            // Insert the new user into the database
-            $sql = "INSERT INTO users (full_name, email, password) VALUES ('$full_name', '$email', '$hashed_password')";
+            // Insert the new user into the database (role defaults to 'customer')
+            $sql = "INSERT INTO users (full_name, email, password, role) VALUES ('$full_name', '$email', '$hashed_password', 'customer')";
 
             if (mysqli_query($conn, $sql)) {
                 $message = "Registration successful! You can now login.";

@@ -47,9 +47,17 @@ session_start();
             <a href="#gallery" class="nav-menu-link" data-nav-link="gallery">Gallery</a>
           </li>
           <?php if (isset($_SESSION['user_id'])): ?>
-          <li class="nav-menu-item" data-nav-item="reservations">
-            <a href="reservations/reservations.php" class="nav-menu-link" data-nav-link="reservations">Reservations</a>
-          </li>
+            <?php if ($_SESSION['role'] == 'admin'): ?>
+              <!-- Show Admin Dashboard for admins -->
+              <li class="nav-menu-item" data-nav-item="admin">
+                <a href="admin/dashboard.php" class="nav-menu-link" data-nav-link="admin">Admin Dashboard</a>
+              </li>
+            <?php else: ?>
+              <!-- Show Reservations for customers -->
+              <li class="nav-menu-item" data-nav-item="reservations">
+                <a href="reservations/reservations.php" class="nav-menu-link" data-nav-link="reservations">Reservations</a>
+              </li>
+            <?php endif; ?>
           <?php endif; ?>
         </ul>
 
@@ -127,7 +135,7 @@ session_start();
           <?php else: ?>
             <!-- If not logged in, show Sign In to Reserve button -->
             <a href="auth/login.php" class="hero-button reserve-btn" data-action="signin">
-              Sign In to Reserve
+              Reserve
             </a>
           <?php endif; ?>
         </div>

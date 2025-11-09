@@ -1,0 +1,27 @@
+===============================================
+DATABASE UPDATE - ADD CANCELLATION REASON
+===============================================
+
+Run this command in your MySQL shell to add a cancellation reason field:
+
+1. Open MySQL shell:
+   mysql -u root -p
+   (Press Enter when asked for password)
+
+2. Select your database:
+   USE grilliance_db;
+
+3. Add the 'cancellation_reason' column:
+   ALTER TABLE reservations ADD COLUMN cancellation_reason TEXT NULL AFTER status;
+
+4. Verify the change:
+   DESCRIBE reservations;
+
+You should see a new 'cancellation_reason' column that can hold text or be NULL.
+
+FEATURES:
+- Admins can enter a reason when cancelling a reservation
+- Customers will see the cancellation reason when they hover over the "Cancelled" status badge
+- Cancelled reservations cannot be edited (only deleted)
+
+===============================================

@@ -1,0 +1,85 @@
+===============================================
+ADMIN DASHBOARD - SETUP GUIDE
+===============================================
+
+STEP 1: UPDATE DATABASE
+------------------------
+1. Open MySQL shell:
+   mysql -u root -p
+   (Press Enter when asked for password)
+
+2. Select your database:
+   USE grilliance_db;
+
+3. Add the 'role' column:
+   ALTER TABLE users ADD COLUMN role ENUM('customer', 'admin') DEFAULT 'customer' AFTER email;
+
+4. Verify the change:
+   DESCRIBE users;
+
+
+STEP 2: CREATE YOUR FIRST ADMIN ACCOUNT
+----------------------------------------
+Option A: Make existing user an admin
+   UPDATE users SET role = 'admin' WHERE email = 'your-email@example.com';
+
+Option B: Register new admin account
+   1. Go to: http://localhost/IM/auth/register.php
+   2. Register with admin credentials (e.g., admin@grilliance.com)
+   3. In MySQL shell, run:
+      UPDATE users SET role = 'admin' WHERE email = 'admin@grilliance.com';
+
+
+STEP 3: TEST THE SYSTEM
+-----------------------
+1. Login with admin account at: http://localhost/IM/auth/login.php
+2. You should see "Admin Dashboard" in the navigation (NOT "Reservations")
+3. Click "Admin Dashboard" to access: http://localhost/IM/admin/dashboard.php
+4. You should see:
+   - Stats showing Pending, Confirmed, and Cancelled counts
+   - All reservations from ALL customers
+   - Approve/Cancel buttons for pending reservations
+
+
+HOW IT WORKS
+------------
+✓ Single login page for both customers and admins
+✓ After login, system checks the user's role
+✓ Customers see: "Reservations" link → Only THEIR reservations
+✓ Admins see: "Admin Dashboard" link → ALL reservations from ALL users
+
+CUSTOMER PERMISSIONS:
+- Create new reservations
+- Edit their own reservations (date, time, guests, special requests)
+- Delete their own reservations
+- CANNOT change status (pending/confirmed/cancelled)
+
+ADMIN PERMISSIONS:
+- View all reservations from all customers
+- Approve reservations (pending → confirmed)
+- Cancel reservations (pending/confirmed → cancelled)
+- See statistics (pending, confirmed, cancelled counts)
+
+
+FILE STRUCTURE
+--------------
+/admin/
+  ├── dashboard.php       - Admin dashboard with all reservations
+  └── admin-style.css     - Styling for admin dashboard
+
+Updated files:
+  ├── /auth/login.php     - Now stores user role in session
+  ├── /auth/register.php  - Sets new users as 'customer' by default
+  ├── /index.php          - Shows different navigation based on role
+  └── /reservations/edit-reservation.php - Customers can't edit status
+
+
+SECURITY NOTES
+--------------
+✓ Admin pages check if user role is 'admin' before allowing access
+✓ Customers are redirected to home page if they try to access admin pages
+✓ Customers can only see/edit/delete their own reservations
+✓ Admins can manage all reservations but don't see customer passwords
+
+
+===============================================

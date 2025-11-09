@@ -1,0 +1,242 @@
+===============================================
+EMAIL NOTIFICATION SYSTEM - SETUP GUIDE
+===============================================
+
+OVERVIEW:
+This system sends automatic email notifications to customers when:
+1. They create a new reservation (pending approval)
+2. Admin approves their reservation
+3. Admin cancels their reservation (with reason)
+
+TECHNOLOGY:
+- PHPMailer library (free, open-source)
+- Gmail SMTP server (free, 500 emails/day limit)
+
+===============================================
+STEP 1: INSTALL COMPOSER (Package Manager)
+===============================================
+
+Composer is a tool that helps install PHP libraries like PHPMailer.
+
+1. Download Composer:
+   - Go to: https://getcomposer.org/download/
+   - Download "Composer-Setup.exe" for Windows
+   - Run the installer
+   - Use the default settings (it will find your PHP automatically)
+
+2. Verify Installation:
+   Open Command Prompt and type:
+   composer --version
+
+   You should see: Composer version 2.x.x
+
+
+===============================================
+STEP 2: INSTALL PHPMAILER
+===============================================
+
+1. Open Command Prompt
+
+2. Navigate to your project folder:
+   cd C:\xampp\htdocs\IM
+
+3. Install PHPMailer:
+   composer require phpmailer/phpmailer
+
+4. Wait for installation to complete
+   This creates a "vendor" folder with PHPMailer library
+
+
+===============================================
+STEP 3: CREATE GMAIL APP PASSWORD
+===============================================
+
+Gmail requires an "App Password" for security (not your regular password)
+
+1. Go to your Google Account:
+   https://myaccount.google.com/
+
+2. Click "Security" in the left menu
+
+3. Enable 2-Step Verification:
+   - Find "2-Step Verification"
+   - Click and follow the steps to enable it
+   - This is REQUIRED for App Passwords
+
+4. Create App Password:
+   - After enabling 2-Step, go back to Security
+   - Find "App passwords" (near bottom)
+   - Click "App passwords"
+   - Select "Mail" and "Windows Computer"
+   - Click "Generate"
+   - COPY THE 16-CHARACTER PASSWORD (you'll need this!)
+   - It looks like: "abcd efgh ijkl mnop"
+
+IMPORTANT: Keep this password safe! You'll add it to email-config.php
+
+
+===============================================
+STEP 4: CONFIGURE EMAIL SETTINGS
+===============================================
+
+1. Open: /config/email-config.php
+
+2. Update these values:
+   - SMTP_USERNAME: Your Gmail address (e.g., yourname@gmail.com)
+   - SMTP_PASSWORD: The 16-character App Password from Step 3
+   - SMTP_FROM_EMAIL: Same as your Gmail address
+   - SMTP_FROM_NAME: Your restaurant name (e.g., "Grilliance Restaurant")
+
+Example:
+define('SMTP_USERNAME', 'jantagalog143@gmail.com');
+define('SMTP_PASSWORD', 'abcd efgh ijkl mnop');  // App Password
+define('SMTP_FROM_EMAIL', 'jantagalog143@gmail.com');
+define('SMTP_FROM_NAME', 'Grilliance Restaurant');
+
+
+===============================================
+STEP 5: TEST THE EMAIL SYSTEM
+===============================================
+
+1. Create a test reservation:
+   - Login as a customer
+   - Create a new reservation
+   - Check your email - you should receive "Reservation Pending" email
+
+2. Test admin approval:
+   - Login as admin
+   - Approve the reservation
+   - Customer should receive "Reservation Approved" email
+
+3. Test admin cancellation:
+   - Create another reservation
+   - Admin cancels with reason
+   - Customer should receive "Reservation Cancelled" email with reason
+
+
+===============================================
+TROUBLESHOOTING
+===============================================
+
+PROBLEM: "SMTP connect() failed"
+SOLUTION:
+- Check your internet connection
+- Verify Gmail credentials are correct
+- Make sure you're using App Password, not regular password
+- Check if 2-Step Verification is enabled
+
+PROBLEM: "Could not authenticate"
+SOLUTION:
+- Double-check the App Password (no spaces)
+- Make sure you copied it correctly from Google
+- Try generating a new App Password
+
+PROBLEM: Emails go to SPAM folder
+SOLUTION:
+- This is normal for testing
+- Mark as "Not Spam" in your email client
+- In production, you'd need a business domain email
+
+PROBLEM: No vendor folder
+SOLUTION:
+- Make sure Composer is installed
+- Run: composer require phpmailer/phpmailer
+- Check you're in the correct directory (C:\xampp\htdocs\IM)
+
+
+===============================================
+HOW IT WORKS (Technical Overview)
+===============================================
+
+1. NEW RESERVATION:
+   File: reservations/new-reservation.php
+   - Customer submits form
+   - Reservation saved to database with status='pending'
+   - sendReservationCreatedEmail() is called
+   - Email sent to customer confirming receipt
+
+2. ADMIN APPROVES:
+   File: admin/dashboard.php
+   - Admin clicks "Approve" button
+   - Status changes to 'confirmed'
+   - sendReservationApprovedEmail() is called
+   - Email sent with confirmation details
+
+3. ADMIN CANCELS:
+   File: admin/dashboard.php
+   - Admin enters cancellation reason
+   - Status changes to 'cancelled'
+   - sendReservationCancelledEmail() is called
+   - Email sent with cancellation reason
+
+
+===============================================
+FILES CREATED/MODIFIED
+===============================================
+
+NEW FILES:
+/config/email-config.php          - Email SMTP settings
+/config/email-functions.php       - Helper functions to send emails
+/vendor/                          - PHPMailer library (auto-generated)
+composer.json                     - Composer dependencies
+composer.lock                     - Composer lock file
+
+MODIFIED FILES:
+/reservations/new-reservation.php - Added email on creation
+/admin/dashboard.php              - Added email on approve/cancel
+
+
+===============================================
+SECURITY NOTES
+===============================================
+
+✓ Never commit email-config.php to public repositories (contains password)
+✓ Use App Passwords, not your main Gmail password
+✓ Gmail allows 500 emails/day (sufficient for small projects)
+✓ For production, consider using business email services
+✓ Keep PHPMailer library updated for security patches
+
+
+===============================================
+GMAIL SMTP SETTINGS (For Reference)
+===============================================
+
+Host: smtp.gmail.com
+Port: 587
+Encryption: TLS
+Authentication: Required
+Username: Your Gmail address
+Password: App Password (16 characters)
+
+
+===============================================
+TESTING CHECKLIST
+===============================================
+
+□ Composer installed successfully
+□ PHPMailer installed (vendor folder exists)
+□ Gmail 2-Step Verification enabled
+□ App Password generated and saved
+□ email-config.php updated with correct credentials
+□ Test email sent successfully
+□ Emails received in inbox (or spam)
+□ Customer receives email on new reservation
+□ Customer receives email when admin approves
+□ Customer receives email when admin cancels
+
+
+===============================================
+SUPPORT
+===============================================
+
+If you encounter issues:
+1. Check this guide's troubleshooting section
+2. Verify all steps were followed in order
+3. Check XAMPP error logs: C:\xampp\apache\logs\error.log
+4. Google the specific error message
+
+PHPMailer Documentation: https://github.com/PHPMailer/PHPMailer
+Gmail SMTP Guide: https://support.google.com/mail/answer/7126229
+
+
+===============================================

@@ -12,6 +12,9 @@ if (!isset($_SESSION['user_id'])) {
 // Include database connection
 include '../config/config.php';
 
+// Include email functions
+include '../config/email-functions.php';
+
 // This variable will hold error or success messages
 $message = "";
 
@@ -30,6 +33,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$user_id', '$reservation_date', '$reservation_time', '$number_of_guests', '$special_requests', 'pending')";
 
     if (mysqli_query($conn, $sql)) {
+        // Get customer email and name to send confirmation email
+        $user_query = "SELECT email, full_name FROM users WHERE id = '$user_id'";
+        $user_result = mysqli_query($conn, $user_query);
+        $user_data = mysqli_fetch_assoc($user_result);
+
+        // Send email notification to customer
+        sendReservationCreatedEmail(
+            $user_data['email'],
+            $user_data['full_name'],
+            $reservation_date,
+            $reservation_time,
+            $number_of_guests
+        );
+
         // Redirect back to reservations page with success message
         header("Location: reservations.php?success=created");
         exit();

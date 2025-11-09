@@ -1,0 +1,40 @@
+===============================================
+DATABASE UPDATE - ADD ROLE COLUMN TO USERS
+===============================================
+
+Run this command in your MySQL shell:
+
+1. Open MySQL shell:
+   mysql -u root -p
+   (Press Enter when asked for password if you don't have one)
+
+2. Select the database:
+   USE grilliance_db;
+
+3. Add the 'role' column to users table:
+   ALTER TABLE users ADD COLUMN role ENUM('customer', 'admin') DEFAULT 'customer' AFTER email;
+
+4. Verify the change:
+   DESCRIBE users;
+
+You should see a new 'role' column with default value 'customer'.
+
+===============================================
+CREATING YOUR FIRST ADMIN ACCOUNT
+===============================================
+
+After running the above command, you need to manually set one user as admin.
+
+Option 1: Update existing user to admin
+   UPDATE users SET role = 'admin' WHERE email = 'your-email@example.com';
+
+Option 2: Register a new account, then update it to admin
+   - Go to http://localhost/IM/auth/register.php
+   - Register with admin credentials (e.g., admin@grilliance.com)
+   - Then in MySQL shell, run:
+     UPDATE users SET role = 'admin' WHERE email = 'admin@grilliance.com';
+
+To verify:
+   SELECT id, name, email, role FROM users;
+
+===============================================

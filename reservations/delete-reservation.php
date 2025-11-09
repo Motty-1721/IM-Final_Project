@@ -16,8 +16,22 @@ include '../config/config.php';
 $reservation_id = $_GET['id'];
 $user_id = $_SESSION['user_id'];
 
+// First check if the reservation is confirmed (confirmed reservations cannot be deleted)
+$check_sql = "SELECT status FROM reservations WHERE id = '$reservation_id' AND user_id = '$user_id'";
+$check_result = mysqli_query($conn, $check_sql);
+
+if (mysqli_num_rows($check_result) > 0) {
+    $reservation = mysqli_fetch_assoc($check_result);
+
+    // If confirmed, redirect back without deleting
+    if ($reservation['status'] == 'confirmed') {
+        header("Location: reservations.php");
+        exit();
+    }
+}
+
 // Delete the reservation from the database
-// Only delete if it belongs to the logged in user
+// Only delete if it belongs to the logged in user and is not confirmed
 $sql = "DELETE FROM reservations WHERE id = '$reservation_id' AND user_id = '$user_id'";
 
 if (mysqli_query($conn, $sql)) {
